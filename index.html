@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Gestão de Futsal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <main id="view-login" class="login" hidden>
+    <form id="login-form" class="login-card" autocomplete="on">
+      <div class="brand-mark" aria-hidden="true">⚽</div>
+      <h1>Gestão de Futsal</h1>
+      <p class="muted">Acesso restrito aos administradores.</p>
+
+      <label>E-mail
+        <input type="email" id="login-email" required autocomplete="username">
+      </label>
+      <label>Senha
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </label>
+
+      <p id="login-error" class="error" role="alert" hidden></p>
+      <button type="submit" class="btn primary block" id="login-btn">Entrar</button>
+    </form>
+  </main>
+
+  <!-- ============ APP ============ -->
+  <div id="view-app" hidden>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <img id="topbar-logo" alt="" hidden>
+        <strong id="topbar-name">Meu Clube</strong>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="club" role="tab">Clube</button>
+        <button class="tab" data-tab="squad" role="tab">Elenco</button>
+        <button class="tab" data-tab="matches" role="tab">Jogos</button>
+        <button class="tab" data-tab="trainings" role="tab">Treinos</button>
+      </nav>
+      <div class="topbar-user">
+        <span id="user-email" class="muted small"></span>
+        <button class="btn ghost" id="logout-btn">Sair</button>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <!-- ---- Perfil do clube ---- -->
+      <section id="tab-club" class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Perfil do clube</h2>
+            <p class="muted">Informações principais da equipe.</p>
+          </div>
+        </div>
+
+        <form id="club-form" class="card form-grid">
+          <div class="logo-field span-2">
+            <div class="logo-preview" id="club-logo-preview">🛡️</div>
+            <div>
+              <label class="file-btn btn">
+                Escolher escudo
+                <input type="file" id="club-logo-file" accept="image/*" hidden>
+              </label>
+              <p class="muted small">PNG, JPG ou WebP, até 2 MB.</p>
+            </div>
+          </div>
+
+          <label>Nome do clube *
+            <input id="club-name" required maxlength="80">
+          </label>
+          <label>Apelido / sigla
+            <input id="club-nickname" maxlength="40">
+          </label>
+          <label>Ano de fundação
+            <input id="club-founded" type="number" min="1800" max="2100">
+          </label>
+          <label>Cidade
+            <input id="club-city" maxlength="80">
+          </label>
+          <label class="span-2">Ginásio / local de jogos
+            <input id="club-venue" maxlength="120">
+          </label>
+          <label>Cor principal
+            <input id="club-color1" type="color" value="#16a34a">
+          </label>
+          <label>Cor secundária
+            <input id="club-color2" type="color" value="#ffffff">
+          </label>
+          <label>E-mail de contato
+            <input id="club-email" type="email">
+          </label>
+          <label>Telefone / WhatsApp
+            <input id="club-phone" type="tel">
+          </label>
+          <label class="span-2">Instagram
+            <input id="club-instagram" placeholder="@seuclube" maxlength="60">
+          </label>
+          <label class="span-2">Sobre o clube
+            <textarea id="club-description" rows="4" maxlength="1000"></textarea>
+          </label>
+
+          <div class="form-actions span-2">
+            <span id="club-status" class="muted small" role="status"></span>
+            <button type="submit" class="btn primary" id="club-save">Salvar alterações</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ---- Elenco ---- -->
+      <section id="tab-squad" class="panel" hidden>
+        <div class="panel-head">
+          <div>
+            <h2>Elenco</h2>
+            <p class="muted" id="squad-count">Carregando…</p>
+          </div>
+          <button class="btn primary" id="player-add">+ Novo jogador</button>
+        </div>
+
+        <div class="toolbar">
+          <input type="search" id="squad-search" placeholder="Buscar por nome, apelido ou número…">
+          <select id="squad-filter-position" aria-label="Filtrar por posição">
+            <option value="">Todas as posições</option>
+            <option>Goleiro</option><option>Fixo</option><option>Ala</option><option>Pivô</option>
+          </select>
+          <select id="squad-filter-status" aria-label="Filtrar por status">
+            <option value="">Todos os status</option>
+            <option>Ativo</option><option>Lesionado</option><option>Suspenso</option><option>Inativo</option>
+          </select>
+        </div>
+
+        <div id="squad-grid" class="grid"></div>
+        <p id="squad-empty" class="empty" hidden>Nenhum jogador encontrado.</p>
+      </section>
+      <!-- ---- Jogos ---- -->
+      <section id="tab-matches" class="panel" hidden>
+        <div class="panel-head">
+          <div>
+            <h2>Jogos</h2>
+            <p class="muted" id="matches-count">Carregando…</p>
+          </div>
+          <button class="btn primary" id="match-add">+ Novo jogo</button>
+        </div>
+
+        <div id="matches-stats" class="stats"></div>
+
+        <div class="toolbar toolbar-2">
+          <select id="matches-filter" aria-label="Filtrar jogos">
+            <option value="">Todos os jogos</option>
+            <option value="next">Próximos</option>
+            <option value="done">Finalizados</option>
+          </select>
+          <input type="search" id="matches-search" placeholder="Buscar por adversário, competição ou local…">
+        </div>
+
+        <div id="matches-list" class="list"></div>
+        <p id="matches-empty" class="empty" hidden>Nenhum jogo encontrado.</p>
+      </section>
+
+      <!-- ---- Treinos ---- -->
+      <section id="tab-trainings" class="panel" hidden>
+        <div class="panel-head">
+          <div>
+            <h2>Treinos</h2>
+            <p class="muted" id="trainings-count">Carregando…</p>
+          </div>
+          <button class="btn primary" id="training-add">+ Novo treino</button>
+        </div>
+
+        <div id="trainings-stats" class="stats"></div>
+
+        <div class="toolbar toolbar-2">
+          <select id="trainings-filter" aria-label="Filtrar treinos">
+            <option value="">Todos os treinos</option>
+            <option value="next">Próximos</option>
+            <option value="done">Realizados</option>
+          </select>
+          <input type="search" id="trainings-search" placeholder="Buscar por foco ou local…">
+        </div>
+
+        <div id="trainings-list" class="list"></div>
+        <p id="trainings-empty" class="empty" hidden>Nenhum treino encontrado.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- ============ MODAL JOGADOR ============ -->
+  <dialog id="player-dialog">
+    <form id="player-form" class="dialog-form" method="dialog">
+      <header class="dialog-head">
+        <h3 id="player-dialog-title">Novo jogador</h3>
+        <button type="button" class="icon-btn" id="player-close" aria-label="Fechar">✕</button>
+      </header>
+
+      <div class="form-grid">
+        <div class="logo-field span-2">
+          <div class="logo-preview round" id="player-photo-preview">👤</div>
+          <div>
+            <label class="file-btn btn">
+              Escolher foto
+              <input type="file" id="player-photo-file" accept="image/*" hidden>
+            </label>
+            <p class="muted small">Até 2 MB.</p>
+          </div>
+        </div>
+
+        <label class="span-2">Nome completo *
+          <input id="p-name" required maxlength="100">
+        </label>
+        <label>Apelido
+          <input id="p-nickname" maxlength="40">
+        </label>
+        <label>Nº da camisa
+          <input id="p-number" type="number" min="0" max="99">
+        </label>
+        <label>Posição *
+          <select id="p-position" required>
+            <option>Goleiro</option><option>Fixo</option><option selected>Ala</option><option>Pivô</option>
+          </select>
+        </label>
+        <label>Status
+          <select id="p-status">
+            <option>Ativo</option><option>Lesionado</option><option>Suspenso</option><option>Inativo</option>
+          </select>
+        </label>
+        <label>Data de nascimento
+          <input id="p-birth" type="date">
+        </label>
+        <label>Pé dominante
+          <select id="p-foot">
+            <option value="">—</option>
+            <option>Direito</option><option>Esquerdo</option><option>Ambidestro</option>
+          </select>
+        </label>
+        <label>Altura (cm)
+          <input id="p-height" type="number" min="100" max="250">
+        </label>
+        <label>Peso (kg)
+          <input id="p-weight" type="number" min="30" max="200" step="0.1">
+        </label>
+        <label>Telefone
+          <input id="p-phone" type="tel">
+        </label>
+        <label>E-mail
+          <input id="p-email" type="email">
+        </label>
+        <label class="span-2">Observações
+          <textarea id="p-notes" rows="3" maxlength="1000"></textarea>
+        </label>
+      </div>
+
+      <p id="player-error" class="error" role="alert" hidden></p>
+
+      <footer class="dialog-actions">
+        <button type="button" class="btn danger" id="player-delete" hidden>Excluir</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" id="player-cancel">Cancelar</button>
+        <button type="submit" class="btn primary" id="player-save">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ============ MODAL JOGO ============ -->
+  <dialog id="match-dialog">
+    <form id="match-form" class="dialog-form" method="dialog">
+      <header class="dialog-head">
+        <h3 id="match-dialog-title">Novo jogo</h3>
+        <button type="button" class="icon-btn" id="match-close" aria-label="Fechar">✕</button>
+      </header>
+
+      <div class="form-grid">
+        <label>Data *
+          <input id="m-date" type="date" required>
+        </label>
+        <label>Horário
+          <input id="m-time" type="time">
+        </label>
+        <label class="span-2">Adversário *
+          <input id="m-opponent" required maxlength="100">
+        </label>
+        <label>Mando
+          <select id="m-home"><option>Casa</option><option>Fora</option><option>Neutro</option></select>
+        </label>
+        <label>Status
+          <select id="m-status">
+            <option>Agendado</option><option>Finalizado</option><option>Adiado</option><option>Cancelado</option>
+          </select>
+        </label>
+        <label>Competição
+          <input id="m-competition" maxlength="80" placeholder="Ex.: Copa da Cidade">
+        </label>
+        <label>Local
+          <input id="m-venue" maxlength="120">
+        </label>
+
+        <div class="span-2 score-grid" id="m-score" hidden>
+          <label>Nossos gols
+            <input id="m-gf" type="number" min="0" max="99">
+          </label>
+          <label>Gols do adversário
+            <input id="m-ga" type="number" min="0" max="99">
+          </label>
+        </div>
+
+        <label class="span-2">Observações
+          <textarea id="m-notes" rows="3" maxlength="1000" placeholder="Gols, cartões, destaques, escalação…"></textarea>
+        </label>
+      </div>
+
+      <p id="match-error" class="error" role="alert" hidden></p>
+
+      <footer class="dialog-actions">
+        <button type="button" class="btn danger" id="match-delete" hidden>Excluir</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" id="match-cancel">Cancelar</button>
+        <button type="submit" class="btn primary" id="match-save">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ============ MODAL TREINO ============ -->
+  <dialog id="training-dialog">
+    <form id="training-form" class="dialog-form" method="dialog">
+      <header class="dialog-head">
+        <h3 id="training-dialog-title">Novo treino</h3>
+        <button type="button" class="icon-btn" id="training-close" aria-label="Fechar">✕</button>
+      </header>
+
+      <div class="form-grid">
+        <label>Data *
+          <input id="t-date" type="date" required>
+        </label>
+        <label>Status
+          <select id="t-status"><option>Agendado</option><option>Realizado</option><option>Cancelado</option></select>
+        </label>
+        <label>Início
+          <input id="t-start" type="time">
+        </label>
+        <label>Fim
+          <input id="t-end" type="time">
+        </label>
+        <label class="span-2">Local
+          <input id="t-location" maxlength="120">
+        </label>
+        <label class="span-2">Foco do treino
+          <input id="t-focus" maxlength="120" placeholder="Ex.: Saída de bola, bola parada, condicionamento">
+        </label>
+        <label class="span-2">Observações
+          <textarea id="t-notes" rows="3" maxlength="1000"></textarea>
+        </label>
+
+        <div class="span-2">
+          <div class="attendance-head">
+            <strong>Presença <span class="muted small" id="t-attendance-count"></span></strong>
+            <button type="button" class="btn ghost small-btn" id="t-all">Marcar todos</button>
+          </div>
+          <div id="t-attendance" class="checklist"></div>
+        </div>
+      </div>
+
+      <p id="training-error" class="error" role="alert" hidden></p>
+
+      <footer class="dialog-actions">
+        <button type="button" class="btn danger" id="training-delete" hidden>Excluir</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn ghost" id="training-cancel">Cancelar</button>
+        <button type="submit" class="btn primary" id="training-save">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
